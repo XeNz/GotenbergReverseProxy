@@ -11,9 +11,12 @@ builder.Services.AddHttpForwarder();
 builder.Services.AddHttpClient();
 builder.Services.RegisterConvertAndMergeHandler();
 builder.Services.Configure<ForwardSettings>(builder.Configuration.GetSection(nameof(ForwardSettings)));
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 app.UseHttpsRedirection();
+app.MapHealthChecks("/health");
+
 app.UseRouting();
 
 var forwardingProxy = new ForwardingProxy(app.Services.GetRequiredService<IHttpForwarder>());

@@ -1,0 +1,68 @@
+﻿apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pdf-generator
+spec:
+  securityContext:
+    privileged: false
+    runAsUser: 1001
+  replicas: 2
+  selector:
+    matchLabels:
+      app: pdf-generator
+  template:
+    metadata:
+      labels:
+        app: pdf-generator
+    spec:
+      containers:
+        - name: gotenberg
+          image: 'gotenberg/gotenberg:7'
+          ports:
+            - containerPort: 3000
+          resources:
+            limits:
+              memory: 1280Mi
+              cpu: 0.5
+            requests:
+              memory: 500Mi
+              cpu: 0.5
+          livenessProbe:
+            httpGet:
+              path: '/health'
+              port: 3000
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            failureThreshold: 15
+          readinessProbe:
+            httpGet:
+              path: '/health'
+              port: 3000
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            failureThreshold: 5
+        - name: gotenberg-reverse-proxy
+          image: 'repository.azurecr.io/registry:gotenberg-reverse-proxy'
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: 0.5
+            requests:
+              memory: 128Mi
+              cpu: 0.5
+          livenessProbe:
+            httpGet:
+              path: '/health'
+              port: 80
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            failureThreshold: 15
+          readinessProbe:
+            httpGet:
+              path: '/health'
+              port: 80
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            failureThreshold: 5

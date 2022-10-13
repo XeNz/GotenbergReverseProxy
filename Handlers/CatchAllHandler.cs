@@ -1,7 +1,7 @@
 ﻿using Yarp.ReverseProxy.Forwarder;
 using Yarp.ReverseProxy.Transforms;
 
-namespace GotenbergReverseProxy;
+namespace GotenbergReverseProxy.Handlers;
 
 internal static class CatchAllDelegate
 {

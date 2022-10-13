@@ -1,0 +1,19 @@
+﻿apiVersion: v1
+kind: Service
+metadata:
+  name: pdf-generator
+  labels:
+    app: pdf-generator
+  annotations:
+    prometheus.io/path: '/prometheus/metrics'
+    prometheus.io/port: '3000'
+    prometheus.io/scrape: 'true'
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 80
+      name: gotenberg-reverse-proxy
+  selector:
+    app: pdf-generator
