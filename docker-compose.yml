@@ -1,0 +1,12 @@
+﻿version: "3.9"
+services:
+  app:
+    build:
+      dockerfile: Dockerfile
+    ports:
+      - "5000:80"
+      - "5001:443"
+  gotenberg:
+    image: gotenberg/gotenberg:7
+    ports:
+      - "3000:3000"
