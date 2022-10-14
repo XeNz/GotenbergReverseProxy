@@ -2,7 +2,7 @@
 
 ## What does this do?
 
-![image info](schema.png)
+![image info](./images/schema.png)
 
 ## Requirements
 
