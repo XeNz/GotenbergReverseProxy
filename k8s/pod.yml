@@ -3,10 +3,7 @@ kind: Deployment
 metadata:
   name: pdf-generator
 spec:
-  securityContext:
-    privileged: false
-    runAsUser: 1001
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: pdf-generator
@@ -15,6 +12,9 @@ spec:
       labels:
         app: pdf-generator
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
       containers:
         - name: gotenberg
           image: 'gotenberg/gotenberg:7'
@@ -23,10 +23,10 @@ spec:
           resources:
             limits:
               memory: 1280Mi
-              cpu: 0.5
+              cpu: '0.5'
             requests:
               memory: 500Mi
-              cpu: 0.5
+              cpu: '0.5'
           livenessProbe:
             httpGet:
               path: '/health'
@@ -42,16 +42,17 @@ spec:
             periodSeconds: 15
             failureThreshold: 5
         - name: gotenberg-reverse-proxy
-          image: 'repository.azurecr.io/registry:gotenberg-reverse-proxy'
+          image: 'gotenberg-reverse-proxy:latest'
+          imagePullPolicy: Never
           ports:
             - containerPort: 80
           resources:
             limits:
               memory: 512Mi
-              cpu: 0.5
+              cpu: '0.5'
             requests:
               memory: 128Mi
-              cpu: 0.5
+              cpu: '0.5'
           livenessProbe:
             httpGet:
               path: '/health'
@@ -66,3 +67,6 @@ spec:
             initialDelaySeconds: 60
             periodSeconds: 15
             failureThreshold: 5
+          env:
+            - name: 'ForwardSettings__GotenbergInstanceUrl'
+              value: 'pdf-generator.default.svc.cluster.local'

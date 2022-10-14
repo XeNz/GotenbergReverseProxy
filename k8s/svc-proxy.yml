@@ -1,0 +1,15 @@
+﻿apiVersion: v1
+kind: Service
+metadata:
+  name: pdf-generator-reverse-proxy
+  labels:
+    app: pdf-generator
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 80
+      name: gotenberg-reverse-proxy
+  selector:
+    app: pdf-generator
