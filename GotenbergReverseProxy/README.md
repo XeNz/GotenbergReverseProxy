@@ -1,7 +1,9 @@
 ﻿# GotenberReverseProxy
 
 ## What does this do?
+
 ![image info](schema.png)
+
 ## Requirements
 
 - Docker + docker-compose
@@ -39,6 +41,24 @@ curl --location --request POST 'http://localhost:5000/forms/chromium/convertAndM
 - Any other kind of PDF conversion follows the [API of Gotenberg](https://gotenberg.dev/docs/modules/api) as these calls get proxied directly to the Gotenberg
   instance by the `/{**catch-all}` route.
 
+- Testing the proxy can be done with the following `cURL`:
+
+```curl
+- curl --location --request POST 'http://localhost:5000/forms/chromium/convert/url' \
+  --form 'url="https://xentricator.be"' \
+  --form 'paperWidth="8.27"' \
+  --form 'paperHeight="11.7"' \
+  --form 'marginTop="1"' \
+  --form 'marginBottom="1"' \
+  --form 'marginLeft="1"' \
+  --form 'marginRight="1"' \
+  --form 'preferCssPageSize="false"' \
+  --form 'printBackground="true"' \
+  --form 'landscape="true"' \
+  --form 'scale="2.0"' \
+  --form 'nativePageRanges="1-5"'
+- ```
+
 ### Test callback endpoint
 
 - There is a `/test` endpoint available in debug mode which does not get included in a `Release` build.
@@ -61,3 +81,16 @@ or
 
 Try using `HTTPS` combined with the `5001` port instead of `5000`. The HTTPS redirect seems to do weird things with streaming multipart/form-data.
 Source: [https://stackoverflow.com/a/55598786](https://stackoverflow.com/a/55598786) 
+
+
+### How to use in Kubernetes
+- Build Docker image: `docker build . -t gotenberg-reverse-proxy:v0.3`
+- Deploy to container registry (or build locally inside minikube when using minikube with `eval $(minikube docker-env)`)
+- Change pod.yml to match image tag `gotenberg-reverse-proxy:v0.3`
+- Deploy to Kubernetes:
+
+```bash 
+kubectl apply -f ./k8s/pod.yml
+kubectl apply -f ./k8s/svc.yml
+kubectl apply -f ./k8s/svc-proxy.yml
+```

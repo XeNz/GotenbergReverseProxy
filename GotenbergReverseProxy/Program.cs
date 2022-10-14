@@ -1,9 +1,9 @@
-using GotenbergReverseProxy;
 using GotenbergReverseProxy.Features;
 using GotenbergReverseProxy.FormFile;
 using GotenbergReverseProxy.Forwarding;
 using GotenbergReverseProxy.Handlers;
 using GotenbergReverseProxy.Settings;
+using Microsoft.Extensions.Options;
 using Yarp.ReverseProxy.Forwarder;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,8 +23,10 @@ var forwardingProxy = new ForwardingProxy(app.Services.GetRequiredService<IHttpF
 app.UseEndpoints(endpoints =>
 {
     endpoints.Map("/{**catch-all}",
-        async httpContext =>
+        async (HttpContext httpContext,
+                IOptionsMonitor<ForwardSettings> forwardSettings) =>
             await CatchAllDelegate.ForwardRequest(
+                forwardSettings.CurrentValue.GotenbergInstanceUrl,
                 forwardingProxy.HttpForwarder,
                 httpContext,
                 forwardingProxy.HttpMessageInvoker,

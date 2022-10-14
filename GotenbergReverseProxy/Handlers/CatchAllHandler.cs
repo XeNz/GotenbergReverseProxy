@@ -6,19 +6,20 @@ namespace GotenbergReverseProxy.Handlers;
 internal static class CatchAllDelegate
 {
     public static async Task ForwardRequest(
+        string forwardUrl,
         IHttpForwarder httpForwarder,
         HttpContext context,
         HttpMessageInvoker httpMessageInvoker,
         ForwarderRequestConfig forwarderRequestConfig)
     {
         var error = await httpForwarder.SendAsync(context,
-            "https://example.com",
+            forwardUrl,
             httpMessageInvoker,
             forwarderRequestConfig,
-            static (context, proxyRequest) =>
+            (_, proxyRequest) =>
             {
                 var queryContext = new QueryTransformContext(context.Request);
-                proxyRequest.RequestUri = RequestUtilities.MakeDestinationAddress("https://example.com", context.Request.Path, queryContext.QueryString);
+                proxyRequest.RequestUri = RequestUtilities.MakeDestinationAddress(forwardUrl,context.Request.Path, queryContext.QueryString);
                 proxyRequest.Headers.Host = null;
 
                 return default;

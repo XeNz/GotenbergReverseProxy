@@ -42,7 +42,7 @@ spec:
             periodSeconds: 15
             failureThreshold: 5
         - name: gotenberg-reverse-proxy
-          image: 'gotenberg-reverse-proxy:latest'
+          image: 'gotenberg-reverse-proxy:v0.3'
           imagePullPolicy: Never
           ports:
             - containerPort: 80
@@ -57,16 +57,16 @@ spec:
             httpGet:
               path: '/health'
               port: 80
-            initialDelaySeconds: 60
+            initialDelaySeconds: 30
             periodSeconds: 15
             failureThreshold: 15
           readinessProbe:
             httpGet:
               path: '/health'
               port: 80
-            initialDelaySeconds: 60
+            initialDelaySeconds: 30
             periodSeconds: 15
             failureThreshold: 5
           env:
             - name: 'ForwardSettings__GotenbergInstanceUrl'
-              value: 'pdf-generator.default.svc.cluster.local'
+              value: 'http://localhost:3000' #Multiple containers in one pod are accessible by localhost
