@@ -28,7 +28,7 @@ curl --location --request POST 'http://localhost:5000/forms/chromium/convertAndM
 --form 'files=@"/C:/Users/Alex/Downloads/PDF1.pdf"' \
 --form 'files=@"/C:/Users/Alex/Downloads/PDF2.pdf"' \
 --form 'url="https://xentricator.be"'
- ```
+```
 
 - Be sure to change all the `files` properties to actual files on your system.
     - The order in which you include files determines the order in which they get merged behind the PDF that gets converted from the URL.
@@ -57,7 +57,7 @@ curl --location --request POST 'http://localhost:5000/forms/chromium/convertAndM
   --form 'landscape="true"' \
   --form 'scale="2.0"' \
   --form 'nativePageRanges="1-5"'
-- ```
+```
 
 ### Test callback endpoint
 
@@ -68,6 +68,7 @@ curl --location --request POST 'http://localhost:5000/forms/chromium/convertAndM
 
 - If you get exceptions such as:
 
+
 ```
    Microsoft.AspNetCore.Server.Kestrel.Core.BadHttpRequestException: Reading the request body timed out due to data arriving too slowly. See MinRequestBodyDataRate.
 ```
@@ -76,7 +77,6 @@ or
 
 ```
  System.IO.IOException: Unexpected end of Stream, the content may have already been read by another component.
-
 ```
 
 Try using `HTTPS` combined with the `5001` port instead of `5000`. The HTTPS redirect seems to do weird things with streaming multipart/form-data.
@@ -89,7 +89,8 @@ Source: [https://stackoverflow.com/a/55598786](https://stackoverflow.com/a/55598
 - Change pod.yml to match image tag `gotenberg-reverse-proxy:v0.3`
 - Deploy to Kubernetes:
 
-```bash 
+
+```
 kubectl apply -f ./k8s/pod.yml
 kubectl apply -f ./k8s/svc.yml
 kubectl apply -f ./k8s/svc-proxy.yml
