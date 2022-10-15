@@ -25,7 +25,7 @@ app.UseEndpoints(endpoints =>
     endpoints.Map("/{**catch-all}",
         async (HttpContext httpContext,
                 IOptionsMonitor<ForwardSettings> forwardSettings) =>
-            await CatchAllDelegate.ForwardRequest(
+            await CatchAllHandler.ForwardRequest(
                 forwardSettings.CurrentValue.GotenbergInstanceUrl,
                 forwardingProxy.HttpForwarder,
                 httpContext,
@@ -55,17 +55,14 @@ app.UseEndpoints(endpoints =>
     endpoints.MapPost("/test",
         async (HttpContext context, ILogger<Program> logger) =>
         {
-            logger.LogDebug("Got new test callback request, got {} form files", context.Request.Form.Files.Count);
-
+            logger.LogDebug("Got new test callback request");
+            var contentDisposition = context.Request.Headers.ContentDisposition;
             var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-            foreach (var formFile in context.Request.Form.Files)
-            {
-                var fileNameWithPath = Path.Combine(path, formFile.FileName);
+            var fileNameWithPath = Path.Combine(path, "pdf.pdf");
 
-                using (var stream = new FileStream(fileNameWithPath, FileMode.Create))
-                {
-                    await formFile.CopyToAsync(stream);
-                }
+            using (var stream = new FileStream(fileNameWithPath, FileMode.Create))
+            {
+                await context.Request.Body.CopyToAsync(stream);
             }
 
             return Results.Accepted();

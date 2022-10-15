@@ -24,7 +24,7 @@ curl --location --request POST 'http://localhost:5000/forms/chromium/convertAndM
 --header 'Gotenberg-Output-Filename: pdf.pdf' \
 --header 'Gotenberg-Webhook-Url: http://localhost:5000/test' \
 --header 'Gotenberg-Webhook-Method: POST' \
---header 'Gotenberg-Generation-Id: 5812ef98-ba44-4339-a4a5-516fdf0bdb98' \
+--header 'Gotenberg-Trace: 5812ef98-ba44-4339-a4a5-516fdf0bdb98' \
 --form 'files=@"/C:/Users/Alex/Downloads/PDF1.pdf"' \
 --form 'files=@"/C:/Users/Alex/Downloads/PDF2.pdf"' \
 --form 'url="https://xentricator.be"'

@@ -9,9 +9,9 @@ public static class GeneratePdfAndMergeFeaturesExtensions
         var headers = request.Headers;
         var features = new GeneratePdfAndMergeFeatures();
 
-        if (headers.ContainsKey(GotenbergHeaders.GenerationId))
+        if (headers.ContainsKey(GotenbergHeaders.Trace))
         {
-            features.GenerationId = new Guid(headers[GotenbergHeaders.GenerationId][0] ?? throw new InvalidOperationException());
+            features.GenerationId = new Guid(headers[GotenbergHeaders.Trace][0] ?? throw new InvalidOperationException());
         }
 
         if (headers.ContainsKey(GotenbergHeaders.OutputFilename))

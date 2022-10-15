@@ -1,4 +1,7 @@
-﻿using GotenbergReverseProxy.Features;
+﻿using System.Net.Http.Headers;
+using System.Net.Mime;
+using GotenbergReverseProxy.Constants;
+using GotenbergReverseProxy.Features;
 using GotenbergReverseProxy.FormFile;
 using GotenbergReverseProxy.Settings;
 using Microsoft.Extensions.Options;
@@ -140,20 +143,27 @@ internal class ConvertAndMergeWebhookHandler : IConvertAndMergeHandler
         HttpMessageInvoker httpClient,
         CancellationToken cancellationToken)
     {
-        var multipartFormDataContent = new MultipartFormDataContent
+        var content = new StreamContent(await completeFile.Content.ReadAsStreamAsync(cancellationToken))
         {
+            Headers =
             {
-                new StreamContent(await completeFile.Content.ReadAsStreamAsync(cancellationToken)),
-                "files",
-                generatePdfAndMergeFeatures.OutputFilename!
+                ContentType = new MediaTypeHeaderValue("application/pdf"),
+                ContentDisposition = new ContentDispositionHeaderValue(DispositionTypeNames.Attachment)
+                {
+                    FileName = generatePdfAndMergeFeatures.OutputFilename
+                }
             }
         };
 
         var httpRequestMessage = new HttpRequestMessage
         {
-            Content = multipartFormDataContent,
+            Content = content,
             Method = generatePdfAndMergeFeatures.WebhookMethod!,
-            RequestUri = new Uri(generatePdfAndMergeFeatures.WebhookUrl!)
+            RequestUri = new Uri(generatePdfAndMergeFeatures.WebhookUrl!),
+            Headers =
+            {
+                { GotenbergHeaders.Trace, new List<string?> { generatePdfAndMergeFeatures.GenerationId.ToString() } }
+            }
         };
 
         var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage, cancellationToken);

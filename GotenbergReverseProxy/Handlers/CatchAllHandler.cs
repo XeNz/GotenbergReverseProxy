@@ -3,7 +3,7 @@ using Yarp.ReverseProxy.Transforms;
 
 namespace GotenbergReverseProxy.Handlers;
 
-internal static class CatchAllDelegate
+internal static class CatchAllHandler
 {
     public static async Task ForwardRequest(
         string forwardUrl,
