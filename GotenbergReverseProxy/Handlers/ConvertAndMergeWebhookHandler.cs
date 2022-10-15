@@ -36,6 +36,7 @@ internal class ConvertAndMergeWebhookHandler : IConvertAndMergeHandler
         var completeFile = await MergeConvertedFileWithAdditionalFiles(
             formFileStreamHolders,
             fileStream,
+            generatePdfAndMergeFeatures,
             httpClient,
             cancellationToken
         );
@@ -53,12 +54,14 @@ internal class ConvertAndMergeWebhookHandler : IConvertAndMergeHandler
     /// </summary>
     /// <param name="formFileStreamHolders"></param>
     /// <param name="fileStream"></param>
+    /// <param name="generatePdfAndMergeFeatures"></param>
     /// <param name="httpClient"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     private async Task<HttpResponseMessage> MergeConvertedFileWithAdditionalFiles(
         List<FormFileStreamHolder> formFileStreamHolders,
         Stream fileStream,
+        GeneratePdfAndMergeFeatures generatePdfAndMergeFeatures,
         HttpClient httpClient,
         CancellationToken cancellationToken)
     {
@@ -78,6 +81,7 @@ internal class ConvertAndMergeWebhookHandler : IConvertAndMergeHandler
                 multipartFormDataContent.Add(new StreamContent(formFile.Stream), "files", $"{index + 2}.pdf");
             }
 
+            multipartFormDataContent.Headers.Add(GotenbergHeaders.Trace, generatePdfAndMergeFeatures.GenerationId.ToString());
             httpResponseMessage = await httpClient.PostAsync(GetMergeUrl(), multipartFormDataContent, cancellationToken);
             httpResponseMessage.EnsureSuccessStatusCode(); // TODO throw custom exception
         }
@@ -118,6 +122,7 @@ internal class ConvertAndMergeWebhookHandler : IConvertAndMergeHandler
                 { new StringContent(generatePdfAndMergeFeatures.PdfUrlToGenerate!), "url" }
             };
 
+            multipartFormDataContent.Headers.Add(GotenbergHeaders.Trace, generatePdfAndMergeFeatures.GenerationId.ToString());
             httpResponseMessage = await httpClient.PostAsync(GetConvertUrl(), multipartFormDataContent, cancellationToken);
             httpResponseMessage.EnsureSuccessStatusCode(); // TODO throw custom exception
         }
