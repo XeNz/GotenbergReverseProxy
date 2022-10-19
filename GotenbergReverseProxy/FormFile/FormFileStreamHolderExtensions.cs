@@ -4,16 +4,11 @@ namespace GotenbergReverseProxy.FormFile;
 
 internal static class FormFileStreamHolderExtensions
 {
-    internal static async Task<List<FormFileStreamHolder>> ConvertIFormFileDetails(
-        this HttpContext httpContext,
-        int count,
-        GeneratePdfAndMergeFeatures features)
+    internal static async Task<List<FormFileStreamHolder>> ExtractFormFileStreams(this IFormCollection form)
     {
-        features.PdfUrlToGenerate = httpContext.Request.Form["url"][0];
-
-        var formFileStreamHolders = new List<FormFileStreamHolder>(count);
-
-        await Task.WhenAll(httpContext.Request.Form.Files
+        var formFileStreamHolders = new List<FormFileStreamHolder>(form.Files.Count);
+        
+        await Task.WhenAll(form.Files
             .Select(async formFile =>
             {
                 var formFileStreamHolder = new FormFileStreamHolder(new MemoryStream());

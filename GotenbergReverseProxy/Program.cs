@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using GotenbergReverseProxy.Features;
 using GotenbergReverseProxy.FormFile;
 using GotenbergReverseProxy.Forwarding;
@@ -39,8 +40,10 @@ app.UseEndpoints(endpoints =>
             IConvertAndMergeHandler convertAndMergeHandler,
             CancellationToken cancellationToken) =>
         {
-            var pdfAndMergeFeatures = context.Request.GetGeneratePdfAndMergeFeaturesFromRequest();
-            var formFileStreamHolders = await context.ConvertIFormFileDetails(context.Request.Form.Files.Count, pdfAndMergeFeatures);
+            var form = await context.Request.ReadFormAsync(cancellationToken);
+
+            var pdfAndMergeFeatures = context.Request.GetGeneratePdfAndMergeFeaturesFromRequest(form);
+            var formFileStreamHolders = await form.ExtractFormFileStreams();
 
             _ = Task.Run(async () => await convertAndMergeHandler.HandleAsync(
                     formFileStreamHolders,
@@ -56,9 +59,10 @@ app.UseEndpoints(endpoints =>
         async (HttpContext context, ILogger<Program> logger) =>
         {
             logger.LogDebug("Got new test callback request");
-            var contentDisposition = context.Request.Headers.ContentDisposition;
+            var contentDisposition = ContentDispositionHeaderValue.Parse(context.Request.Headers.ContentDisposition);
+            
             var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-            var fileNameWithPath = Path.Combine(path, "pdf.pdf");
+            var fileNameWithPath = Path.Combine(path, contentDisposition.FileName ?? throw new InvalidOperationException());
 
             using (var stream = new FileStream(fileNameWithPath, FileMode.Create))
             {

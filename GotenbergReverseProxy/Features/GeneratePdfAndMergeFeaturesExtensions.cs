@@ -4,7 +4,7 @@ namespace GotenbergReverseProxy.Features;
 
 public static class GeneratePdfAndMergeFeaturesExtensions
 {
-    public static GeneratePdfAndMergeFeatures GetGeneratePdfAndMergeFeaturesFromRequest(this HttpRequest request)
+    public static GeneratePdfAndMergeFeatures GetGeneratePdfAndMergeFeaturesFromRequest(this HttpRequest request, IFormCollection formCollection)
     {
         var headers = request.Headers;
         var features = new GeneratePdfAndMergeFeatures();
@@ -24,7 +24,8 @@ public static class GeneratePdfAndMergeFeaturesExtensions
             features.WebhookMethod = new HttpMethod(headers[GotenbergHeaders.WebhookMethod][0] ?? throw new InvalidOperationException());
             features.WebhookUrl = headers[GotenbergHeaders.WebhookUrl][0] ?? throw new InvalidOperationException();
         }
-
+        
+        features.PdfUrlToGenerate = formCollection["url"][0];
 
         return features;
     }
